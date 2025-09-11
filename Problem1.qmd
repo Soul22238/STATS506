@@ -30,6 +30,37 @@ a
 ```{r}
 file_path <- "./abalone/abalone.data"
 abalone <- read.table(file_path, sep = ",")
-abalone.names <- c("Sex", "Length", "Diameter","Height","Whole weight","Shucked weight", "Viscera weight", "Shell weight", "Rings")
+abalone.names <- c("Sex", "Length", "Diameter","Height","Whole weight","ShuckedWeight", "VisceraWeight", "ShellWeight", "Rings")
 colnames(abalone) <- abalone.names
 ```
+
+b
+```{r}
+table(abalone$Sex)
+```
+
+c.1.
+The Shell Weight has the highest correlation with Rings
+```{r}
+cor(abalone$ShuckedWeight, abalone$Rings)
+cor(abalone$VisceraWeight, abalone$Rings)
+cor(abalone$ShellWeight, abalone$Rings)
+```
+
+c.2.
+The Male has a higher correlation of Shell Weight with Rings.
+```{r}
+sub_F <- abalone[abalone$Sex == "F",]
+sub_I <- abalone[abalone$Sex == "M",]
+sub_M <- abalone[abalone$Sex == "I",]
+cor(sub_F$ShellWeight, sub_F$Rings)
+cor(sub_I$ShellWeight, sub_I$Rings)
+cor(sub_M$ShellWeight, sub_M$Rings)
+```
+
+
+
+
+
+
+
