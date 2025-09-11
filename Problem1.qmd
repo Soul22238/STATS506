@@ -30,7 +30,7 @@ a
 ```{r}
 file_path <- "./abalone/abalone.data"
 abalone <- read.table(file_path, sep = ",")
-abalone.names <- c("Sex", "Length", "Diameter","Height","Whole weight","ShuckedWeight", "VisceraWeight", "ShellWeight", "Rings")
+abalone.names <- c("Sex", "Length", "Diameter","Height","WholeWeight","ShuckedWeight", "VisceraWeight", "ShellWeight", "Rings")
 colnames(abalone) <- abalone.names
 ```
 
@@ -58,9 +58,36 @@ cor(sub_I$ShellWeight, sub_I$Rings)
 cor(sub_M$ShellWeight, sub_M$Rings)
 ```
 
+c.3
+```{r}
+abalone[abalone$Rings == max(abalone$Rings),]$WholeWeight
+abalone[abalone$Rings == max(abalone$Rings),]$ShuckedWeight
+abalone[abalone$Rings == max(abalone$Rings),]$VisceraWeight
+abalone[abalone$Rings == max(abalone$Rings),]$ShellWeight
+```
 
+c.4
+```{r}
+weights <- c("WholeWeight", "ShuckedWeight", "VisceraWeight", "ShellWeight")
+sexes <- unique(abalone$Sex)
 
+corr_table <- matrix(NA, nrow = length(sexes), ncol = length(weights),
+                     dimnames = list(sexes, weights))
+for (s in sexes) {
+  subdata <- abalone[abalone$Sex == s, ]
+  for (w in weights) {
+    corr_table[s, w] <- cor(subdata[[w]], subdata$Rings)
+  }
+}
 
+corr_table
+```
+c.5.
+```{r}
+t.test(Rings ~ Sex, data = abalone, subset = Sex %in% c("M","F"))
+t.test(Rings ~ Sex, data = abalone, subset = Sex %in% c("M","I"))
+t.test(Rings ~ Sex, data = abalone, subset = Sex %in% c("F","I"))
+```
 
 
 
