@@ -20,8 +20,8 @@ colnames(abalone) <- abalone.names
 ```
 
 ## b
-
-The data contains 1307 female, 1528 male and 1342 Infant
+I used Chatgpt to explain how to make a table.
+The data contains 1307 female, 1528 male and 1342 Infant.
 
 ```{r}
 table(abalone$Sex)
@@ -91,7 +91,7 @@ corr_table
 ```
 
 ## e
-
+I used chatgpt to explain how the t test works.
 A series of two-sample t-tests was conducted to compare the mean number of rings across the three sexes (F, M, I). The p value for each test is smaller than 0.05. The pairwise t tests reveals significant differences for rings at the 5% level.
 
 ```{r}
@@ -169,7 +169,7 @@ expmisc_criterion<- !is.na(exp_misc_num) & exp_misc_num >= 0 & exp_misc_num < 10
 ```
 
 ## g
-The number of times dining out was treated as a numeric variable, with valid values being non-negative and within a reasonable upper limit (less than 10,000).
+The number of times dining out was treated as a numeric variable, with valid values being non-negative and within a reasonable upper limit (less than 10000).
 ```{r}
 dining_count <- as.numeric(USD_food$Dining_Count)
 diningCount_criterion<- !is.na(dining_count) & dining_count >= 0 & dining_count < 10000 
@@ -188,6 +188,7 @@ length(final_food$ID)
 
 # Problem 3
 ## a
+I used chatgpt to explain how to check for numeric input and integer.
 ```{r}
 #' Function to computes the next number in its Collatz sequence
 #'
@@ -214,7 +215,7 @@ nextCollatz(16)
 ```
 
 ## b
-
+I used chatgpt to explain how to check for numeric input and integer.
 ```{r}
 #' Function to computes a Collatz sequence for a number
 #'
