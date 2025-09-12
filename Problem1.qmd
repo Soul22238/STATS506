@@ -73,7 +73,7 @@ for (s in sexes) {
 corr_table
 ```
 e
-
+A series of two-sample t-tests was conducted to compare the mean number of rings across the three sexes (F, M, I). The p value for each test is smaller than 0.05. The pairwise t tests reveals significant differences for rings at the 5% level.
 ```{r}
 t.test(Rings ~ Sex, data = abalone, subset = Sex %in% c("M","F"))
 t.test(Rings ~ Sex, data = abalone, subset = Sex %in% c("M","I"))
