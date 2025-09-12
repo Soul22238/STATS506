@@ -1,8 +1,12 @@
 ---
 title: "Problem Set 1"
-format: html
+format:
+  html:
+    embed-resources: true
 editor: visual
 ---
+Github link:
+https://github.com/Soul22238/STATS506
 
 # Problem 1
 
