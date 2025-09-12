@@ -3052,7 +3052,7 @@ vertical-align: -.125em;
 </section>
 <section id="b" class="level2">
 <h2 class="anchored" data-anchor-id="b">b</h2>
-<p>The data contains 1307 female, 1528 male and 1342 Infant</p>
+<p>I used Chatgpt to explain how to make a table. The data contains 1307 female, 1528 male and 1342 Infant.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(abalone<span class="sc">$</span>Sex)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -3166,7 +3166,7 @@ I   0.6963268    0.62024577     0.6732727   0.7254357</code></pre>
 </section>
 <section id="e" class="level2">
 <h2 class="anchored" data-anchor-id="e">e</h2>
-<p>A series of two-sample t-tests was conducted to compare the mean number of rings across the three sexes (F, M, I). The p value for each test is smaller than 0.05. The pairwise t tests reveals significant differences for rings at the 5% level.</p>
+<p>I used chatgpt to explain how the t test works. A series of two-sample t-tests was conducted to compare the mean number of rings across the three sexes (F, M, I). The p value for each test is smaller than 0.05. The pairwise t tests reveals significant differences for rings at the 5% level.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">t.test</span>(Rings <span class="sc">~</span> Sex, <span class="at">data =</span> abalone, <span class="at">subset =</span> Sex <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;M&quot;</span>,<span class="st">&quot;F&quot;</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -3291,7 +3291,7 @@ mean in group F mean in group I
 </section>
 <section id="g" class="level2">
 <h2 class="anchored" data-anchor-id="g">g</h2>
-<p>The number of times dining out was treated as a numeric variable, with valid values being non-negative and within a reasonable upper limit (less than 10,000).</p>
+<p>The number of times dining out was treated as a numeric variable, with valid values being non-negative and within a reasonable upper limit (less than 10000).</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>dining_count <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(USD_food<span class="sc">$</span>Dining_Count)</span>
 <span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>diningCount_criterion<span class="ot">&lt;-</span> <span class="sc">!</span><span class="fu">is.na</span>(dining_count) <span class="sc">&amp;</span> dining_count <span class="sc">&gt;=</span> <span class="dv">0</span> <span class="sc">&amp;</span> dining_count <span class="sc">&lt;</span> <span class="dv">10000</span> </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -3313,6 +3313,7 @@ mean in group F mean in group I
 <h1>Problem 3</h1>
 <section id="a-2" class="level2">
 <h2 class="anchored" data-anchor-id="a-2">a</h2>
+<p>I used chatgpt to explain how to check for numeric input and integer.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; Function to computes the next number in its Collatz sequence</span></span>
 <span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;</span></span>
@@ -3346,6 +3347,7 @@ mean in group F mean in group I
 </section>
 <section id="b-2" class="level2">
 <h2 class="anchored" data-anchor-id="b-2">b</h2>
+<p>I used chatgpt to explain how to check for numeric input and integer.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; Function to computes a Collatz sequence for a number</span></span>
 <span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;</span></span>
