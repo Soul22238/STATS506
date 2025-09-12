@@ -34,6 +34,7 @@ table(abalone$Sex)
 The Shell Weight has the highest correlation with Rings.
 
 ```{r}
+cor(abalone$WholeWeight, abalone$Rings)
 cor(abalone$ShuckedWeight, abalone$Rings)
 cor(abalone$VisceraWeight, abalone$Rings)
 cor(abalone$ShellWeight, abalone$Rings)
@@ -41,12 +42,12 @@ cor(abalone$ShellWeight, abalone$Rings)
 
 ### 2
 
-The male has a higher correlation of Shell Weight with Rings.
+The infant have a higher correlation of Shell Weight with Rings.
 
 ```{r}
 sub_F <- abalone[abalone$Sex == "F",]
-sub_I <- abalone[abalone$Sex == "M",]
-sub_M <- abalone[abalone$Sex == "I",]
+sub_I <- abalone[abalone$Sex == "I",]
+sub_M <- abalone[abalone$Sex == "M",]
 cor(sub_F$ShellWeight, sub_F$Rings)
 cor(sub_I$ShellWeight, sub_I$Rings)
 cor(sub_M$ShellWeight, sub_M$Rings)
@@ -136,7 +137,7 @@ length(USD_food$ID)
 
 ## d
 
-For the age variable, we excluded all minors under the age of 18 and larger than 100 because teens may not know the expenditure of food in a family and people at the age larger than 100 may not have the ability to take care of themselves the food.
+For the age variable, we excluded individuals under 18 and over 100. Teenagers may not accurately report household food expenditures, and people over 100 may no longer be able to manage their own food consumption.
 
 ```{r}
 age_criterion <- USD_food$Age <100 & USD_food$Age > 18
@@ -151,7 +152,7 @@ state_criterion <- USD_food$State %in% valid_states
 ```
 
 ## f
-For the four variables related to food expenditures. The expenses of food must be a positive number and not enormously larger (larger than 10000).
+For the four variables related to food expenditures, values were required to be positive and not excessively large (less than 10000).
 ```{r}
 exp_total_num <- as.numeric(USD_food$FoodExp_Total )
 expTotal_criterion<- !is.na(exp_total_num) & exp_total_num >= 0 & exp_total_num < 10000 
@@ -168,7 +169,7 @@ expmisc_criterion<- !is.na(exp_misc_num) & exp_misc_num >= 0 & exp_misc_num < 10
 ```
 
 ## g
-For the numbers of time dining out, the variable should be a numeric number and larger or equal than 0 and not enormously larger (larger than 10000).
+The number of times dining out was treated as a numeric variable, with valid values being non-negative and within a reasonable upper limit (less than 10,000).
 ```{r}
 dining_count <- as.numeric(USD_food$Dining_Count)
 diningCount_criterion<- !is.na(dining_count) & dining_count >= 0 & dining_count < 10000 
@@ -234,26 +235,30 @@ collatzSequence <- function(x) {
     num = nextCollatz(num)
     sequence <- c(sequence, num)
   }
-  return(list(sequence,length(sequence)))
+  return(list(seq = sequence,length = length(sequence)))
 }
 collatzSequence(5)
 collatzSequence(19)
 ```
 
 ## c
-The shortest and longest Collatz sequence start with value 8 and 144
+The shortest and longest Collatz sequence start with value 128 and 327
 ```{r}
 shortest <- 1/0
+shortest_start <- NA
 longest <- -1/0
+longest_start <- NA
 for (i in seq(100,500)){
   seq_len <- collatzSequence(i)[[2]]
   if (seq_len < shortest){
     shortest <- seq_len
+    shortest_start <- i
   }
   if (seq_len > longest){
     longest <- seq_len
+    longest_start <- i
   }
 }
-shortest
-longest
+shortest_start 
+longest_start
 ```
