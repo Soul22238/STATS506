@@ -5,7 +5,7 @@ editor: visual
 ---
 
 
-Problem 1
+# Problem 1
 a
 ```{r}
 file_path <- "./abalone/abalone.data"
@@ -56,6 +56,7 @@ About 6.51% of the abalones have a viscera weight larger than their shell weight
 length(abalone[abalone$VisceraWeight>abalone$ShellWeight,"Sex"])/length(abalone$Sex) * 100
 ```
 
+d
 ```{r}
 weights <- c("WholeWeight", "ShuckedWeight", "VisceraWeight", "ShellWeight")
 sexes <- unique(abalone$Sex)
@@ -71,14 +72,15 @@ for (s in sexes) {
 
 corr_table
 ```
-c.5.
+e
+
 ```{r}
 t.test(Rings ~ Sex, data = abalone, subset = Sex %in% c("M","F"))
 t.test(Rings ~ Sex, data = abalone, subset = Sex %in% c("M","I"))
 t.test(Rings ~ Sex, data = abalone, subset = Sex %in% c("F","I"))
 ```
 
-Problem 2
+# Problem 2
 a
 ```{r}
 food <- read.csv("food_expenditure.csv")
