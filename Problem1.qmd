@@ -4,28 +4,8 @@ format: html
 editor: visual
 ---
 
-## Quarto
 
-Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
-
-## Running Code
-
-When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
-
-```{r}
-1 + 1
-```
-
-You can add options to executable code like this
-
-```{r}
-#| echo: false
-2 * 2
-```
-
-The `echo: false` option disables the printing of code (only output is displayed).
-
-Question 1
+Problem 1
 a
 ```{r}
 file_path <- "./abalone/abalone.data"
@@ -35,12 +15,13 @@ colnames(abalone) <- abalone.names
 ```
 
 b
+The data contains 1307 female, 1528 male and 1342 Infant
 ```{r}
 table(abalone$Sex)
 ```
 
 c.1.
-The Shell Weight has the highest correlation with Rings
+The Shell Weight has the highest correlation with Rings.
 ```{r}
 cor(abalone$ShuckedWeight, abalone$Rings)
 cor(abalone$VisceraWeight, abalone$Rings)
@@ -48,7 +29,7 @@ cor(abalone$ShellWeight, abalone$Rings)
 ```
 
 c.2.
-The Male has a higher correlation of Shell Weight with Rings.
+The male has a higher correlation of Shell Weight with Rings.
 ```{r}
 sub_F <- abalone[abalone$Sex == "F",]
 sub_I <- abalone[abalone$Sex == "M",]
@@ -59,14 +40,22 @@ cor(sub_M$ShellWeight, sub_M$Rings)
 ```
 
 c.3
+The whole weight of the abalone that has the maximum rings is 1.875. 
+The shucked weight of the abalone that has the maximum rings is 0.7055.
+The viscera weight of the abalone that has the maximum rings is 0.3215.
+The shell weight of the abalone that has the maximum rings is 0.475.
 ```{r}
 abalone[abalone$Rings == max(abalone$Rings),]$WholeWeight
 abalone[abalone$Rings == max(abalone$Rings),]$ShuckedWeight
 abalone[abalone$Rings == max(abalone$Rings),]$VisceraWeight
 abalone[abalone$Rings == max(abalone$Rings),]$ShellWeight
 ```
-
 c.4
+About 6.51% of the abalones have a viscera weight larger than their shell weight.
+```{r}
+length(abalone[abalone$VisceraWeight>abalone$ShellWeight,"Sex"])/length(abalone$Sex) * 100
+```
+
 ```{r}
 weights <- c("WholeWeight", "ShuckedWeight", "VisceraWeight", "ShellWeight")
 sexes <- unique(abalone$Sex)
@@ -146,8 +135,70 @@ length(final_food$ID)
 ```
 
 Problem 3
+a
 ```{r}
-
-
+#' Function to computes the next number in its Collatz sequence
+#'
+#' @param x a positive integer
+#' @return next number in its Collatz sequence for `x`
+nextCollatz <- function(x) {
+  # Check for invalid input
+  if (!is.numeric(x) || length(x) != 1) {
+    stop("Input must be a single numeric value.")
+  }
+  if (x <= 0 || x != as.integer(x)) {
+    stop("Input must be a positive integer.")
+  }
+    
+  if (x %% 2 == 0) {      
+    next_x <- x / 2
+  } else {
+    next_x <- 3 * x + 1
+  }
+  return(next_x)
+}
+nextCollatz(5)
+nextCollatz(16)
 ```
-
+b
+```{r}
+#' Function to computes a Collatz sequence for a number
+#'
+#' @param x a positive integer
+#' @return next number in its Collatz sequence for `x`
+collatzSequence <- function(x) {
+  # Check for invalid input
+  if (!is.numeric(x) || length(x) != 1) {
+    stop("Input must be a single numeric value.")
+  }
+  if (x <= 0 || x != as.integer(x)) {
+    stop("Input must be a positive integer.")
+  }
+    
+  sequence <- c(x)
+  num <- x
+  while (num != 1){
+    num = nextCollatz(num)
+    sequence <- c(sequence, num)
+  }
+  return(list(sequence,length(sequence)))
+}
+collatzSequence(5)
+collatzSequence(19)
+```
+c
+```{r}
+shortest <- 1/0
+longest <- -1/0
+for (i in seq(100,500)){
+  seq_len <- collatzSequence(i)[[2]]
+  if (seq_len < shortest){
+    shortest <- seq_len
+  }
+  if (seq_len > longest){
+    longest <- seq_len
+  }
+}
+shortest
+longest
+```
