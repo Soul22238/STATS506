@@ -89,5 +89,65 @@ t.test(Rings ~ Sex, data = abalone, subset = Sex %in% c("M","I"))
 t.test(Rings ~ Sex, data = abalone, subset = Sex %in% c("F","I"))
 ```
 
+Problem 2
+a
+```{r}
+food <- read.csv("food_expenditure.csv")
+```
 
+b
+```{r}
+colnames(food) <- c(
+  "ID",
+  "Age",
+  "HH_Size",        
+  "State",
+  "Currency",
+  "FoodExp_Total",
+  "FoodExp_Grocery",
+  "FoodExp_Dining",
+  "FoodExp_Misc",
+  "Dining_Count",
+  "Alcohol_Included",
+  "Food_Assist"
+)
+```
+c
+```{r}
+length(food$ID)
+USD_food <- food[food$Currency == "USD",]
+length(USD_food$ID)
+```
+d
+```{r}
+age_criterion <- USD_food$Age <100 & USD_food$Age > 18
+valid_states <- c(state.abb, "DC", "PR")
+state_criterion <- USD_food$State %in% valid_states
+
+exp_total_num <- as.numeric(USD_food$FoodExp_Total )
+expTotal_criterion<- !is.na(exp_total_num) & exp_total_num >= 0 & exp_total_num < 10000 
+
+exp_grocery_num <- as.numeric(USD_food$FoodExp_Grocery )
+expGrocery_criterion<- !is.na(exp_grocery_num) & exp_grocery_num >= 0 & exp_grocery_num < 10000 
+
+exp_dining_num <- as.numeric(USD_food$FoodExp_Dining )
+expDining_criterion<- !is.na(exp_dining_num) & exp_dining_num >= 0 & exp_dining_num < 10000 
+
+exp_misc_num <- as.numeric(USD_food$FoodExp_Misc )
+expmisc_criterion<- !is.na(exp_misc_num) & exp_misc_num >= 0 & exp_misc_num < 10000 
+
+
+dining_count <- as.numeric(USD_food$Dining_Count)
+diningCount_criterion<- !is.na(dining_count) & dining_count >= 0 & dining_count < 10000 
+
+final_food <- USD_food[age_criterion & state_criterion & expTotal_criterion & expGrocery_criterion & expDining_criterion & expmisc_criterion & diningCount_criterion, ]
+length(final_food$ID)
+
+```
+
+Problem 3
+```{r}
+
+
+```
 
