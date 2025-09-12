@@ -4,9 +4,10 @@ format: html
 editor: visual
 ---
 
-
 # Problem 1
-a
+
+## a
+
 ```{r}
 file_path <- "./abalone/abalone.data"
 abalone <- read.table(file_path, sep = ",")
@@ -14,22 +15,30 @@ abalone.names <- c("Sex", "Length", "Diameter","Height","WholeWeight","ShuckedWe
 colnames(abalone) <- abalone.names
 ```
 
-b
+## b
+
 The data contains 1307 female, 1528 male and 1342 Infant
+
 ```{r}
 table(abalone$Sex)
 ```
 
-c.1.
+## c
+
+### 1
+
 The Shell Weight has the highest correlation with Rings.
+
 ```{r}
 cor(abalone$ShuckedWeight, abalone$Rings)
 cor(abalone$VisceraWeight, abalone$Rings)
 cor(abalone$ShellWeight, abalone$Rings)
 ```
 
-c.2.
+### 2
+
 The male has a higher correlation of Shell Weight with Rings.
+
 ```{r}
 sub_F <- abalone[abalone$Sex == "F",]
 sub_I <- abalone[abalone$Sex == "M",]
@@ -39,24 +48,27 @@ cor(sub_I$ShellWeight, sub_I$Rings)
 cor(sub_M$ShellWeight, sub_M$Rings)
 ```
 
-c.3
-The whole weight of the abalone that has the maximum rings is 1.875. 
-The shucked weight of the abalone that has the maximum rings is 0.7055.
-The viscera weight of the abalone that has the maximum rings is 0.3215.
-The shell weight of the abalone that has the maximum rings is 0.475.
+### 3
+
+The whole weight of the abalone that has the maximum rings is 1.875. The shucked weight of the abalone that has the maximum rings is 0.7055. The viscera weight of the abalone that has the maximum rings is 0.3215. The shell weight of the abalone that has the maximum rings is 0.475.
+
 ```{r}
 abalone[abalone$Rings == max(abalone$Rings),]$WholeWeight
 abalone[abalone$Rings == max(abalone$Rings),]$ShuckedWeight
 abalone[abalone$Rings == max(abalone$Rings),]$VisceraWeight
 abalone[abalone$Rings == max(abalone$Rings),]$ShellWeight
 ```
-c.4
+
+### 4
+
 About 6.51% of the abalones have a viscera weight larger than their shell weight.
+
 ```{r}
 length(abalone[abalone$VisceraWeight>abalone$ShellWeight,"Sex"])/length(abalone$Sex) * 100
 ```
 
-d
+## d
+
 ```{r}
 weights <- c("WholeWeight", "ShuckedWeight", "VisceraWeight", "ShellWeight")
 sexes <- unique(abalone$Sex)
@@ -72,8 +84,11 @@ for (s in sexes) {
 
 corr_table
 ```
-e
+
+## e
+
 A series of two-sample t-tests was conducted to compare the mean number of rings across the three sexes (F, M, I). The p value for each test is smaller than 0.05. The pairwise t tests reveals significant differences for rings at the 5% level.
+
 ```{r}
 t.test(Rings ~ Sex, data = abalone, subset = Sex %in% c("M","F"))
 t.test(Rings ~ Sex, data = abalone, subset = Sex %in% c("M","I"))
@@ -81,12 +96,15 @@ t.test(Rings ~ Sex, data = abalone, subset = Sex %in% c("F","I"))
 ```
 
 # Problem 2
-a
+
+## a
+
 ```{r}
 food <- read.csv("food_expenditure.csv")
 ```
 
-b
+## b
+
 ```{r}
 colnames(food) <- c(
   "ID",
@@ -103,18 +121,34 @@ colnames(food) <- c(
   "Food_Assist"
 )
 ```
-c
+
+## c
+
 ```{r}
 length(food$ID)
 USD_food <- food[food$Currency == "USD",]
 length(USD_food$ID)
 ```
-d
+
+## d
+
+For the age variable, we excluded all minors under the age of 18 and larger than 100 because teens may not know the expenditure of food in a family and people at the age larger than 100 may not have the ability to take care of themselves the food.
+
 ```{r}
 age_criterion <- USD_food$Age <100 & USD_food$Age > 18
+```
+
+## e
+For the state variable, we only include states in the USA.
+
+```{r}
 valid_states <- c(state.abb, "DC", "PR")
 state_criterion <- USD_food$State %in% valid_states
+```
 
+## f
+For the four variables related to food expenditures. The expenses of food must be a positive number and not enormously larger (larger than 10000).
+```{r}
 exp_total_num <- as.numeric(USD_food$FoodExp_Total )
 expTotal_criterion<- !is.na(exp_total_num) & exp_total_num >= 0 & exp_total_num < 10000 
 
@@ -127,17 +161,28 @@ expDining_criterion<- !is.na(exp_dining_num) & exp_dining_num >= 0 & exp_dining_
 exp_misc_num <- as.numeric(USD_food$FoodExp_Misc )
 expmisc_criterion<- !is.na(exp_misc_num) & exp_misc_num >= 0 & exp_misc_num < 10000 
 
+```
 
+## g
+For the numbers of time dining out, the variable should be a numeric number and larger or equal than 0 and not enormously larger (larger than 10000).
+```{r}
 dining_count <- as.numeric(USD_food$Dining_Count)
 diningCount_criterion<- !is.na(dining_count) & dining_count >= 0 & dining_count < 10000 
+
+```
+
+## h
+The final number of observations after this cleaning is 134.
+```{r}
+
 
 final_food <- USD_food[age_criterion & state_criterion & expTotal_criterion & expGrocery_criterion & expDining_criterion & expmisc_criterion & diningCount_criterion, ]
 length(final_food$ID)
 
 ```
 
-Problem 3
-a
+# Problem 3
+## a
 ```{r}
 #' Function to computes the next number in its Collatz sequence
 #'
@@ -162,7 +207,9 @@ nextCollatz <- function(x) {
 nextCollatz(5)
 nextCollatz(16)
 ```
-b
+
+## b
+
 ```{r}
 #' Function to computes a Collatz sequence for a number
 #'
@@ -188,7 +235,9 @@ collatzSequence <- function(x) {
 collatzSequence(5)
 collatzSequence(19)
 ```
-c
+
+## c
+The shortest and longest Collatz sequence start with value 8 and 144
 ```{r}
 shortest <- 1/0
 longest <- -1/0
