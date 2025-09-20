@@ -1,0 +1,115 @@
+---
+title: "Problem Set 1"
+format:
+  html:
+    embed-resources: true
+editor: visual
+---
+
+Github link: https://github.com/Soul22238/STATS506
+# Problem Set 2
+## Problem 1
+### a
+```{r}
+#' Function to determine the end position of a random walk using loops
+#'
+#' @param n number of steps
+#' @return The final position of the walk after `n` number of steps
+random_walk1 <- function(n){
+  cur <- 0
+  probs <- 0.5 * c(0.95, 0.05, 0.8, 0.2)
+  steps <- sample(c(1, 10, -1, -3), 3*n, prob = probs, replace = TRUE)
+  for (i in 1:(3*n)){
+    cur <- cur + steps[i]
+  }
+  return(cur) 
+}
+
+#' Function to determine the end position of a random walk using built-in R vectorized functions
+#'
+#' @param n number of steps
+#' @return The final position of the walk after `n` number of steps
+random_walk2 <- function(n){
+  probs <- 0.5 * c(0.95, 0.05, 0.8, 0.2)
+  steps <- sample(c(1, 10, -1, -3), 3*n,  prob = probs, replace = TRUE)
+  return (sum(steps))
+}
+
+#' Function to determine the end position of a random walk using sapply
+#'
+#' @param n number of steps
+#' @return The final position of the walk after `n` number of steps
+random_walk3 <- function(n){
+  probs <- 0.5 * c(0.95, 0.05, 0.8, 0.2)
+  steps <- sample(c(1, 10, -1, -3), 3*n,  prob = probs, replace = TRUE)
+  steps <- matrix(steps, nrow = 1)
+  return(apply(steps, 1, sum))
+
+}
+
+
+random_walk1(10)
+random_walk2(10)
+random_walk3(10)
+random_walk1(1000)
+random_walk2(1000)
+random_walk3(1000)
+
+```
+### b
+```{r}
+set.seed(15)
+random_walk1(10)
+set.seed(15)
+random_walk2(10)
+set.seed(15)
+random_walk3(10)
+set.seed(15)
+random_walk1(1000)
+set.seed(15)
+random_walk2(1000)
+set.seed(15)
+random_walk3(1000)
+```
+### c
+```{r}
+library(microbenchmark)
+set.seed(123)
+microbenchmark(
+  loop = random_walk1(1000),
+  vectorized = random_walk2(1000),
+  apply = random_walk3(1000)
+)
+set.seed(123)
+microbenchmark(
+  loop = random_walk1(100000),
+  vectorized = random_walk2(100000),
+  apply = random_walk3(100000)
+)
+```
+
+### d
+```{r}
+
+n_sim = 10000
+result1 <- sapply(1:n_sim, function(i) random_walk2(10))
+
+prob1 <- mean(result1 == 0)
+
+result2 <- sapply(1:n_sim, function(i) random_walk2(100))
+prob2 <- mean(result2 == 0)
+
+result3 <- sapply(1:n_sim, function(i) random_walk2(1000))
+prob3 <- mean(result3 == 0)
+prob1
+prob2
+prob3
+```
+
+## Problem 2
+```{r}
+n_sim <- 10000 * c(8,8,6,2)
+sim <- c(rpois(n_sim[1],1) , rpois(n_sim[2],8), rpois(n_sim[3],12), rnorm(n_sim[4],mean = 60,sd = sqrt(12)))
+mean(sim)
+```
+
