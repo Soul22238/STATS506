@@ -5,8 +5,8 @@ format:
     embed-resources: true
 editor: visual
 ---
-Github link:
-https://github.com/Soul22238/STATS506
+
+Github link: https://github.com/Soul22238/STATS506
 
 # Problem 1
 
@@ -20,8 +20,8 @@ colnames(abalone) <- abalone.names
 ```
 
 ## b
-I used Chatgpt to explain how to make a table.
-The data contains 1307 female, 1528 male and 1342 Infant.
+
+I used Chatgpt to explain how to make a table. The data contains 1307 female, 1528 male and 1342 Infant.
 
 ```{r}
 table(abalone$Sex)
@@ -91,8 +91,8 @@ corr_table
 ```
 
 ## e
-I used chatgpt to explain how the t test works.
-A series of two-sample t-tests was conducted to compare the mean number of rings across the three sexes (F, M, I). The p value for each test is smaller than 0.05. The pairwise t tests reveals significant differences for rings at the 5% level.
+
+I used chatgpt to explain how the t test works. A series of two-sample t-tests was conducted to compare the mean number of rings across the three sexes (F, M, I). The p value for each test is smaller than 0.05. The pairwise t tests reveals significant differences for rings at the 5% level.
 
 ```{r}
 t.test(Rings ~ Sex, data = abalone, subset = Sex %in% c("M","F"))
@@ -144,6 +144,7 @@ age_criterion <- USD_food$Age <100 & USD_food$Age > 18
 ```
 
 ## e
+
 For the state variable, we only include states in the USA.
 
 ```{r}
@@ -152,7 +153,9 @@ state_criterion <- USD_food$State %in% valid_states
 ```
 
 ## f
+
 For the four variables related to food expenditures, values were required to be positive and not excessively large (less than 10000).
+
 ```{r}
 exp_total_num <- as.numeric(USD_food$FoodExp_Total )
 expTotal_criterion<- !is.na(exp_total_num) & exp_total_num >= 0 & exp_total_num < 10000 
@@ -169,7 +172,9 @@ expmisc_criterion<- !is.na(exp_misc_num) & exp_misc_num >= 0 & exp_misc_num < 10
 ```
 
 ## g
+
 The number of times dining out was treated as a numeric variable, with valid values being non-negative and within a reasonable upper limit (less than 10000).
+
 ```{r}
 dining_count <- as.numeric(USD_food$Dining_Count)
 diningCount_criterion<- !is.na(dining_count) & dining_count >= 0 & dining_count < 10000 
@@ -177,7 +182,9 @@ diningCount_criterion<- !is.na(dining_count) & dining_count >= 0 & dining_count 
 ```
 
 ## h
+
 The final number of observations after this cleaning is 134.
+
 ```{r}
 
 
@@ -187,8 +194,11 @@ length(final_food$ID)
 ```
 
 # Problem 3
+
 ## a
+
 I used chatgpt to explain how to check for numeric input and integer.
+
 ```{r}
 #' Function to computes the next number in its Collatz sequence
 #'
@@ -215,7 +225,9 @@ nextCollatz(16)
 ```
 
 ## b
+
 I used chatgpt to explain how to check for numeric input and integer.
+
 ```{r}
 #' Function to computes a Collatz sequence for a number
 #'
@@ -243,7 +255,9 @@ collatzSequence(19)
 ```
 
 ## c
+
 The shortest and longest Collatz sequence start with value 128 and 327
+
 ```{r}
 shortest <- 1/0
 shortest_start <- NA

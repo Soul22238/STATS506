@@ -112,4 +112,8 @@ n_sim <- 10000 * c(8,8,6,2)
 sim <- c(rpois(n_sim[1],1) , rpois(n_sim[2],8), rpois(n_sim[3],12), rnorm(n_sim[4],mean = 60,sd = sqrt(12)))
 mean(sim)
 ```
+## Problem 3
+```{r}
+youtube <- read.csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-03-02/youtube.csv')
+```
 
