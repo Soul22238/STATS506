@@ -136,6 +136,14 @@ i) N/A
 ii) View counts, Like counts, Dislike counts, Comment counts
 iii) year, funny, show_product_quickly, patriotic, celebrity, danger, animals, use_sex, kind, category_id, favorite_count
 
+Reasoning:
+The response variable in a linear regression model should be numerical and continuous. 
+View counts, like counts, dislike counts, and comment counts are discrete, so they cannot be used directly as outcomes, but a log transformation can make them more suitable. 
+Year is better treated as an index or a covariate rather than as a response variable. 
+The variables funny, show_product_quickly, patriotic, celebrity, danger, animals, and use_sex are binary, so if they are used as outcomes, logistic regression would be more appropriate. 
+Kind and category_id are categorical variables and are not suitable as response variables. 
+Since all values of favorite_count are zero, it is also not an appropriate outcome variable.
+
 ```{r}
 cat("=======year========\n")
 is.numeric(youtube_clean$year)
