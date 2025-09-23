@@ -109,6 +109,7 @@ prob3
 ```
 
 ## Problem 2
+The average number of cars that pass an intersection per day is around 264.
 ```{r}
 n <- 10000
 n_sim <- n * c(8,8,6,2)
@@ -231,6 +232,9 @@ dim(youtube_clean)
 
 ```
 ### c
+Based on the p-values of the estimated coefficients, year has a statistically significant effect on like_count and comment_count at the 5% level. Holding all other variables constant, a one-year increase is associated with an estimated 0.075 increase in log(like_count) and a 0.053 increase in log(comment_count).
+
+Similarly, patrioticTRUE is statistically significant for comment_count at the 5% level. Holding other factors constant, ads labeled as patriotic are associated with an estimated 0.935 higher log(comment_count) compared to non-patriotic ads.
 ```{r}
 mod1 <- lm(view_count_log ~ year + funny + show_product_quickly + patriotic + celebrity + danger + animals + use_sex, youtube_clean)
 mod2 <- lm(like_count_log ~ year + funny + show_product_quickly + patriotic + celebrity + danger + animals + use_sex, youtube_clean)
