@@ -114,7 +114,98 @@ sim <- c(rpois(n_sim[1],1) , rpois(n_sim[2],8), rpois(n_sim[3],12), rnorm(n_sim[
 sum(sim)/n
 ```
 ## Problem 3
+### a
 ```{r}
 youtube <- read.csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-03-02/youtube.csv')
+youtube_clean <- youtube[, !(names(youtube) %in% c(
+  "brand",
+  "superbowl_ads_dot_com_url",
+  "youtube_url",
+  "id",
+  "etag",
+  "published_at",
+  "channel_title",
+  "thumbnail",
+  "title",
+  "description"
+))]
+dim(youtube_clean)
 ```
+### b
+i) N/A
+ii) View counts, Like counts, Dislike counts, Favorite counts, Comment counts
+iii) year, funny, show_product_quickly, patriotic, celebrity, danger, animals, use_sex, kind, category_id
 
+```{r}
+cat("=======year========\n")
+is.numeric(youtube_clean$year)
+hist(youtube_clean$year)
+
+cat("=======funny========\n")
+is.numeric(youtube_clean$funny)
+class(youtube_clean$funny)
+table(youtube_clean$funny, useNA = "ifany")
+
+cat("=======show_product_quickly========\n")
+is.numeric(youtube_clean$show_product_quickly)
+class(youtube_clean$show_product_quickly)
+table(youtube_clean$show_product_quickly, useNA = "ifany")
+
+cat("=======patriotic========\n")
+is.numeric(youtube_clean$patriotic)
+class(youtube_clean$patriotic)
+table(youtube_clean$patriotic, useNA = "ifany")
+
+cat("=======celebrity========\n")
+is.numeric(youtube_clean$celebrity)
+class(youtube_clean$celebrity)
+table(youtube_clean$celebrity, useNA = "ifany")
+
+cat("=======danger========\n")
+is.numeric(youtube_clean$danger)
+class(youtube_clean$danger)
+table(youtube_clean$danger, useNA = "ifany")
+
+cat("=======animals========\n")
+is.numeric(youtube_clean$animals)
+class(youtube_clean$animals)
+table(youtube_clean$animals, useNA = "ifany")
+
+cat("=======use_sex========\n")
+is.numeric(youtube_clean$use_sex)
+class(youtube_clean$use_sex)
+table(youtube_clean$use_sex, useNA = "ifany")
+
+cat("=======kind========\n")
+is.numeric(youtube_clean$kind)
+class(youtube_clean$kind)
+table(youtube_clean$kind, useNA = "ifany")
+
+cat("=======view_count========\n")
+is.numeric(youtube_clean$view_count)
+hist(youtube_clean$view_count)
+table(youtube_clean$view_count, useNA = "ifany")
+
+cat("=======like_count========\n")
+is.numeric(youtube_clean$like_count)
+hist(youtube_clean$like_count)
+table(youtube_clean$like_count, useNA = "ifany")
+
+cat("=======dislike_count========\n")
+is.numeric(youtube_clean$dislike_count)
+hist(youtube_clean$dislike_count)
+table(youtube_clean$dislike_count, useNA = "ifany")
+
+cat("=======favorite_count========\n")
+is.numeric(youtube_clean$favorite_count)
+table(youtube_clean$favorite_count, useNA = "ifany")
+
+cat("=======comment_count========\n")
+is.numeric(youtube_clean$comment_count)
+hist(youtube_clean$comment_count)
+table(youtube_clean$comment_count, useNA = "ifany")
+
+cat("=======category_id========\n")
+is.numeric(youtube_clean$category_id)
+table(youtube_clean$category_id, useNA = "ifany")
+```
