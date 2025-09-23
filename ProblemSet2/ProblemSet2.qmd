@@ -133,8 +133,8 @@ dim(youtube_clean)
 ```
 ### b
 i) N/A
-ii) View counts, Like counts, Dislike counts, Favorite counts, Comment counts
-iii) year, funny, show_product_quickly, patriotic, celebrity, danger, animals, use_sex, kind, category_id
+ii) View counts, Like counts, Dislike counts, Comment counts
+iii) year, funny, show_product_quickly, patriotic, celebrity, danger, animals, use_sex, kind, category_id, favorite_count
 
 ```{r}
 cat("=======year========\n")
@@ -208,4 +208,46 @@ table(youtube_clean$comment_count, useNA = "ifany")
 cat("=======category_id========\n")
 is.numeric(youtube_clean$category_id)
 table(youtube_clean$category_id, useNA = "ifany")
+```
+```{r}
+youtube_clean$view_count_log     <- log1p(youtube_clean$view_count)
+youtube_clean$like_count_log     <- log1p(youtube_clean$like_count)
+youtube_clean$dislike_count_log  <- log1p(youtube_clean$dislike_count)
+youtube_clean$comment_count_log  <- log1p(youtube_clean$comment_count)
+
+youtube_clean <- na.omit(youtube_clean)
+dim(youtube_clean)
+
+```
+### c
+```{r}
+mod1 <- lm(view_count_log ~ year + funny + show_product_quickly + patriotic + celebrity + danger + animals + use_sex, youtube_clean)
+mod2 <- lm(like_count_log ~ year + funny + show_product_quickly + patriotic + celebrity + danger + animals + use_sex, youtube_clean)
+mod3 <- lm(dislike_count_log ~ year + funny + show_product_quickly + patriotic + celebrity + danger + animals + use_sex, youtube_clean)
+mod4 <- lm(comment_count_log ~ year + funny + show_product_quickly + patriotic + celebrity + danger + animals + use_sex, youtube_clean)
+
+
+summary(mod1)
+summary(mod2)
+summary(mod3)
+summary(mod4)
+
+```
+### d
+```{r}
+X <- model.matrix(view_count_log ~ year + funny + show_product_quickly + patriotic + celebrity + danger + animals + use_sex, data = youtube_clean)
+beta1 <- solve(t(X)%*%X)%*%t(X)%*%youtube_clean$view_count_log
+beta1
+
+#X2 <- model.matrix(like_count_log ~ year + funny + show_product_quickly + patriotic + celebrity + danger + animals + use_sex, youtube_clean)
+beta2 <- solve(t(X)%*%X)%*%t(X)%*%youtube_clean$like_count_log
+beta2
+#X3 <- model.matrix(dislike_count_log ~ year + funny + show_product_quickly + patriotic + celebrity + danger + animals + use_sex, youtube_clean)
+beta3 <- solve(t(X)%*%X)%*%t(X)%*%youtube_clean$dislike_count_log
+beta3
+#X4 <- model.matrix(comment_count_log ~ year + funny + show_product_quickly + patriotic + celebrity + danger + animals + use_sex, youtube_clean)
+beta4 <- solve(t(X)%*%X)%*%t(X)%*%youtube_clean$comment_count_log
+beta4
+
+
 ```
