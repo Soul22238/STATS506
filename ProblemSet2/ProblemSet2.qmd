@@ -72,6 +72,7 @@ set.seed(15)
 random_walk3(1000)
 ```
 ### c
+The results show that the vectorized function consistently outperforms the other implementations, such as loop and apply. The apply function is generally faster than explicit loops because it uses implicit looping internally.
 ```{r}
 library(microbenchmark)
 set.seed(123)
@@ -217,6 +218,7 @@ cat("=======category_id========\n")
 is.numeric(youtube_clean$category_id)
 table(youtube_clean$category_id, useNA = "ifany")
 ```
+The dimension of the table is 219 * 20
 ```{r}
 youtube_clean$view_count_log     <- log1p(youtube_clean$view_count)
 youtube_clean$like_count_log     <- log1p(youtube_clean$like_count)
