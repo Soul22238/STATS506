@@ -90,7 +90,7 @@ microbenchmark(
 ```
 
 ### d
-The probability that the random walk ends at 0 is approximately 0.04 when the number of steps is 10. For 100 steps, the probability decreases to around 0.01, and for 1,000 steps, it drops further to about 0.002.
+The probability that the random walk ends at 0 is approximately 0.1355 when the number of steps is 10. For 100 steps, the probability decreases to around 0.0217, and for 1,000 steps, it drops further to about 0.0046.
 ```{r}
 
 n_sim = 10000

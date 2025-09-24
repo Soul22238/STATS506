@@ -3079,27 +3079,27 @@ vertical-align: -.125em;
 <span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a><span class="fu">random_walk1</span>(<span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 9</code></pre>
+<pre><code>[1] 0</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">random_walk2</span>(<span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] -6</code></pre>
+<pre><code>[1] -8</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">random_walk3</span>(<span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 7</code></pre>
+<pre><code>[1] -8</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">random_walk1</span>(<span class="dv">1000</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 147</code></pre>
+<pre><code>[1] -16</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">random_walk2</span>(<span class="dv">1000</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 38</code></pre>
+<pre><code>[1] 7</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">random_walk3</span>(<span class="dv">1000</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 38</code></pre>
+<pre><code>[1] 116</code></pre>
 </div>
 </div>
 <section id="b" class="level3">
@@ -3158,10 +3158,10 @@ overflows</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Unit: microseconds
-       expr    min      lq    mean  median      uq    max neval
-       loop 31.283 32.5335 34.7393 33.1895 36.2030 65.887   100
- vectorized 20.336 21.3610 23.0133 21.9145 24.2515 38.458   100
-      apply 32.185 34.0505 37.8061 36.6335 39.4420 58.794   100</code></pre>
+       expr    min      lq     mean  median      uq    max neval
+       loop 31.119 32.3900 33.33177 32.8820 33.4560 39.770   100
+ vectorized 20.418 21.4430 22.67546 21.7505 22.3245 38.335   100
+      apply 32.759 33.8455 35.93363 34.3785 35.8955 50.266   100</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
 <span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="fu">microbenchmark</span>(</span>
@@ -3172,15 +3172,15 @@ overflows</code></pre>
 <div class="cell-output cell-output-stdout">
 <pre><code>Unit: milliseconds
        expr      min       lq     mean   median       uq      max neval
-       loop 2.862497 2.918032 3.003901 2.952164 2.998494 5.552261   100
- vectorized 1.734423 1.803180 1.852333 1.823003 1.861092 3.290496   100
-      apply 2.074887 2.268776 2.464947 2.303544 2.369349 6.253402   100</code></pre>
+       loop 2.855117 2.921066 3.000150 2.952144 2.986276 5.170797   100
+ vectorized 1.776120 1.816034 1.858178 1.837456 1.871793 3.152531   100
+      apply 2.195714 2.294319 2.487217 2.354487 2.411128 4.493846   100</code></pre>
 </div>
 </div>
 </section>
 <section id="d" class="level3">
 <h3 class="anchored" data-anchor-id="d">d</h3>
-<p>The probability that the random walk ends at 0 is approximately 0.04 when the number of steps is 10. For 100 steps, the probability decreases to around 0.01, and for 1,000 steps, it drops further to about 0.002.</p>
+<p>The probability that the random walk ends at 0 is approximately 0.1355 when the number of steps is 10. For 100 steps, the probability decreases to around 0.0217, and for 1,000 steps, it drops further to about 0.0046.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>n_sim <span class="ot">=</span> <span class="dv">10000</span></span>
 <span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>result1 <span class="ot">&lt;-</span> <span class="fu">sapply</span>(<span class="dv">1</span><span class="sc">:</span>n_sim, <span class="cf">function</span>(i) <span class="fu">random_walk2</span>(<span class="dv">10</span>))</span>
