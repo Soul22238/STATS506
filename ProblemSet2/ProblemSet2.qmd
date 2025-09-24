@@ -6,7 +6,7 @@ format:
 editor: visual
 ---
 
-Github link: https://github.com/Soul22238/STATS506
+Github link: https://github.com/Soul22238/STATS506/tree/main/ProblemSet2
 # Problem Set 2
 ## Problem 1
 ### a
@@ -18,9 +18,9 @@ Github link: https://github.com/Soul22238/STATS506
 random_walk1 <- function(n){
   cur <- 0
   probs <- 0.5 * c(0.95, 0.05, 0.8, 0.2)
-  steps <- sample(c(1, 10, -1, -3), n, prob = probs, replace = TRUE)
   for (i in 1:n){
-    cur <- cur + steps[i]
+    step <- sample(c(1, 10, -1, -3), 1, prob = probs, replace = TRUE)
+    cur <- cur + step
   }
   return(cur) 
 }
