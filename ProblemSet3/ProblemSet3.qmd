@@ -1,0 +1,277 @@
+---
+title: "Problem Set 3"
+format:
+  html:
+    embed-resources: true
+editor: visual
+---
+
+Github link: https://github.com/Soul22238/STATS506/tree/main/ProblemSet3
+# Problem 1
+## a
+I queried chatgpt for how to generate codes to load .xpt data. Then I modified the codes.
+```{r}
+library(foreign)
+AUX <- read.xport("AUX_I.xpt")
+DEMO <- read.xport("DEMO_I.xpt")
+
+merged <- merge(AUX, DEMO, by = "SEQN", all = FALSE)
+dim(merged)
+```
+
+## b
+```{r}
+
+gender <- merged$RIAGENDR
+# 1 = Male, 2 = Female
+gender <- factor(gender,
+                 levels = c(1, 2),
+                 labels = c("Male", "Female"))
+# Gender does not have NA values
+table(gender, useNA = "ifany")
+
+citizenship_status <- merged$DMDCITZN
+citizenship_status <- factor(citizenship_status,
+                 levels = c(1, 2),
+                 labels = c("Citizen", "NotCitizen"))
+citizenship_status[citizenship_status %in% c(7, 9)] <- NA
+table(citizenship_status, useNA = "ifany")
+
+n5 <- merged$DMDHHSZA 
+# number of children under 5 years old does not have NA values
+# n5 <- factor(n5,
+#             levels = c(0, 1, 2, 3),
+#             labels = c("ZeroChild", "OneChild", "TwoChildren", "ThreeOrMoreChildren"))
+table(n5, useNA = "ifany")
+
+household_income <- merged$INDHHIN2 
+table(merged$INDHHIN2 )
+codes_to_exclude <- c(7, 9, 12, 13)
+household_income[household_income %in% codes_to_exclude] <- NA
+valid_codes <- c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 14, 15)
+
+income_labels <- c(
+    # 1 - 4: Under $20,000
+    "$0 - $4,999", "$5,000 - $9,999", "$10,000 - $14,999", "$15,000 - $19,999",
+    # 5 - 10: $20,000 to $74,999
+    "$20,000 - $24,999", "$25,000 - $34,999", "$35,000 - $44,999", "$45,000 - $54,999",
+    "$55,000 - $64,999", "$65,000 - $74,999",
+    # 14 - 15: Highest tiers
+    "$75,000 - $99,999", "$100,000 and Over"
+)
+
+household_income <- factor(
+    household_income,
+    levels = valid_codes,
+    labels = income_labels,
+    exclude = NA,        
+    ordered = TRUE       
+)
+table(household_income, useNA = "ifany")
+
+merged$RIAGENDR <- gender
+merged$DMDCITZN <- citizenship_status
+merged$DMDHHSZA <- n5
+merged$INDHHIN2 <- household_income
+colnames(merged)[colnames(merged) == "RIAGENDR"] <- "gender"
+colnames(merged)[colnames(merged) == "DMDCITZN"] <- "citizenship_status"
+colnames(merged)[colnames(merged) == "DMDHHSZA"] <- "number_children_smaller_than5"
+colnames(merged)[colnames(merged) == "INDHHIN2"] <- "household_income"
+
+```
+
+## c
+```{r}
+
+income_midpoints <- c(
+  "$0 - $4,999"          = 2500,
+  "$5,000 - $9,999"      = 7500,
+  "$10,000 - $14,999"    = 12500,
+  "$15,000 - $19,999"    = 17500,
+  "$20,000 - $24,999"    = 22500,
+  "$25,000 - $34,999"    = 30000,
+  "$35,000 - $44,999"    = 40000,
+  "$45,000 - $54,999"    = 50000,
+  "$55,000 - $64,999"    = 60000,
+  "$65,000 - $74,999"    = 70000,
+  "$75,000 - $99,999"    = 87500,
+  "$100,000 and Over"    = 110000
+)
+
+merged$income_continuous <- income_midpoints[as.character(merged$household_income)]
+
+
+model_1R <- glm(AUXTWIDR ~ gender, data = merged, family = poisson())
+
+model_2R <- glm(AUXTWIDR ~ gender + citizenship_status + number_children_smaller_than5 +  income_continuous, data = merged, family = poisson())
+
+model_1L <- glm(AUXTWIDL ~ gender, data = merged, family = poisson())
+
+model_2L <- glm(AUXTWIDL ~  gender + citizenship_status + number_children_smaller_than5 +  income_continuous, data = merged, family = poisson())
+
+library(knitr)
+library(pscl)
+
+
+model_list <- list(
+  "1R" = model_1R,
+  "2R" = model_2R,
+  "1L" = model_1L,
+  "2L" = model_2L
+)
+
+
+model_names <- names(model_list)
+coef_table <- NULL
+
+for(i in seq_along(model_list)) {
+  m <- model_list[[i]]
+  name <- model_names[i]
+  
+  coefs <- summary(m)$coefficients
+  irr <- exp(coefs[,1])
+  
+  tmp <- data.frame(
+    Model = name,
+    Term = rownames(coefs),
+    Estimate = round(coefs[,1], 3),
+    StdError = round(coefs[,2], 3),
+    IRR = round(irr, 3),
+    Pvalue = round(coefs[,4], 4)
+  )
+  coef_table <- rbind(coef_table, tmp)
+}
+
+stat_table <- NULL
+for(i in seq_along(model_list)) {
+  m <- model_list[[i]]
+  name <- model_names[i]
+  stat_table <- rbind(stat_table, data.frame(
+    Model = name,
+    N = nobs(m),
+    Pseudo_R2 = round(as.numeric(pscl::pR2(m)["McFadden"]), 3),
+    AIC = round(AIC(m), 1)
+  ))
+}
+
+
+kable(coef_table, caption = "Estimated Incidence Rate Ratios (IRR) for Poisson Models")
+
+kable(stat_table, caption = "Model Statistics (Sample Size, Pseudo-R², and AIC)")
+
+```
+```{r}
+coef_gender <- summary(model_2L)$coefficients["genderFemale", "Estimate"]
+se_gender <- summary(model_2L)$coefficients["genderFemale", "Std. Error"]
+
+IRR <- exp(coef_gender)
+CI_lower <- exp(coef_gender - 1.96 * se_gender)
+CI_upper <- exp(coef_gender + 1.96 * se_gender)
+
+cat("IRR =", round(IRR, 2), " (95% CI:", round(CI_lower, 2), "-", round(CI_upper, 2), ")\n")
+
+
+model_data <- model_2L$model
+
+
+model_data$predicted_left <- predict(model_2L, type = "response")
+
+
+tapply(model_data$predicted_left, model_data$gender, mean)
+
+
+t_test_result <- t.test(predicted_left ~ gender, data = model_data)
+t_test_result
+
+
+cat("Mean predicted value (Male):", 
+    round(mean(model_data$predicted_left[model_data$gender == "Male"], na.rm = TRUE), 3), "\n")
+cat("Mean predicted value (Female):", 
+    round(mean(model_data$predicted_left[model_data$gender == "Female"], na.rm = TRUE), 3), "\n")
+cat("p-value from t-test:", round(t_test_result$p.value, 4), "\n")
+
+if (t_test_result$p.value < 0.05) {
+  cat("Interpretation: The predicted tympanometric width differs significantly between men and women.\n")
+} else {
+  cat("Interpretation: There is no statistically significant difference in predicted tympanometric width between men and women.\n")
+}
+
+```
+# Problem 2
+## a
+I queried chatGPT for apply functions to write active ratios
+```{r}
+library(DBI)
+sakila <- dbConnect(RSQLite::SQLite(), "sakila.db")
+## b. Compare performance with microbenchmark
+library(microbenchmark)
+library(DBI)
+library(RSQLite)
+
+sakila <- dbConnect(SQLite(), "sakila.db")
+customer <- dbGetQuery(sakila, "SELECT * FROM customer")
+
+#' Regular R expression version 
+base_method <- function() {
+  store1 <- customer[customer$store_id == 1, ]
+  store2 <- customer[customer$store_id == 2, ]
+  tbl <- data.frame(
+    store_id = c(1, 2),
+    active_ratio = c(
+      sum(store1$active == 1) / nrow(store1),
+      sum(store2$active == 1) / nrow(store2)
+    ),
+    customer_count = c(nrow(store1), nrow(store2))
+  )
+  tbl
+}
+
+# SQL method
+#' SQL query version
+sql_method <- function() {
+  dbGetQuery(
+    sakila,
+    "SELECT store_id,
+            SUM(CASE WHEN active = 1 THEN 1 ELSE 0 END) * 1.0 / COUNT(*) AS active_ratio,
+            COUNT(customer_id) AS customer_count
+     FROM customer
+     GROUP BY store_id"
+  )
+}
+
+base_method()
+sql_method()
+
+# Benchmark
+microbenchmark(
+  Base_R = base_method(),
+  SQL_Query = sql_method(),
+  times = 50
+)
+
+
+```
+## b
+```{r}
+# SQL method
+#' SQL query version
+sql_method <- function() {
+ dbGetQuery(
+   sakila,
+   "SELECT staff.staff_id AS staff_id, staff.first_name AS first_name, staff.last_name AS last_name, add_country.country AS country 
+    FROM staff 
+    LEFT JOIN
+      (SELECT add_city.addr_id AS addr_id, country.country AS country
+      FROM country AS country
+      RIGHT JOIN
+        (SELECT address.address_id AS addr_id, city.country_id AS country_id
+         FROM address AS address
+         LEFT JOIN city AS city ON address.city_id = city.city_id) AS add_city
+      ON country.country_id = add_city.country_id) AS add_country
+     ON staff.address_id = add_country.addr_id
+   "
+ )
+}
+
+sql_method()
+```
