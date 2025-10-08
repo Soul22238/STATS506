@@ -391,5 +391,43 @@ tbl <- table(usernames)
 most_common <- names(tbl)[which.max(tbl)]
 most_common
 
+```
 
+## c
+```{r}
+# Including &
+mean(grepl("[^a-zA-Z, ]", records$company_name))
+# Excluding &
+mean(grepl("[^a-zA-Z, &]", records$company_name))
+
+```
+## d
+```{r}
+phone1_part1 <- substr(records$phone1, 1, 2)
+phone1_part2 <- substr(records$phone1, 4, 7)
+phone1_part3 <- substr(records$phone1, 9, 12)
+
+phone1 <- paste(phone1_part1, phone1_part2, phone1_part3, sep = "")
+phone1_part1 <- substr(phone1 , 1, 4)
+phone1_part2 <- substr(phone1 , 5, 7)
+phone1_part3 <- substr(phone1 , 8, 10)
+
+phone1 <- paste(phone1_part1, phone1_part2, phone1_part3, sep = "-")
+records$phone1 <-phone1
+records$phone1[1:10]
+records$phone2[1:10]
+```
+
+## e
+```{r}
+apartments <- records$address[grepl("[0-9]+$", records$address)]
+numbers <- sapply(strsplit(apartments, " "), function(x) x[length(x)])
+numbers <- as.numeric(gsub("#", "", numbers))
+hist(log(numbers))
+```
+
+## f
+The apartment numbers do not follow Benford’s Law, as the distribution of the leading digits is not decreasing as expected.
+```{r}
+table(substr(numbers, 1, 1))
 ```
