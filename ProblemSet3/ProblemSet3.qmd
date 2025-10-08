@@ -252,7 +252,32 @@ microbenchmark(
 
 ```
 ## b
+I queried chatGPT for merging two tables in R and then revised the codes.
 ```{r}
+# Base R method
+#' Regular R expression version 
+base_method <- function() {
+  staff <- dbGetQuery(sakila, "SELECT * FROM staff")
+  address <- dbGetQuery(sakila, "SELECT * FROM address")
+  city <- dbGetQuery(sakila, "SELECT * FROM city")
+  country <- dbGetQuery(sakila, "SELECT * FROM country")
+  address <- subset(address, select = -last_update)
+  city <- subset(city, select = -last_update)
+  country <- subset(country, select = -last_update)
+  staff <- subset(staff, select = -last_update)
+  # address + city
+  add_city <- merge(address, city, by.x = "city_id", by.y = "city_id", all.x = TRUE)
+  
+  # add_city + country
+  add_country <- merge(add_city, country, by.x = "country_id", by.y = "country_id", all.y =   TRUE)
+  
+  # staff + add_country
+  result <- merge(staff, add_country, by.x = "address_id", by.y = "address_id", all.x = TRUE)
+  
+  result <- result[, c("staff_id", "first_name", "last_name", "country")]
+  result
+}
+
 # SQL method
 #' SQL query version
 sql_method <- function() {
@@ -272,6 +297,84 @@ sql_method <- function() {
    "
  )
 }
-
+base_method()
 sql_method()
+# Benchmark
+microbenchmark(
+  Base_R = base_method(),
+  SQL_Query = sql_method(),
+  times = 50
+)
+```
+### c
+```{r}
+# Base R method
+#' Regular R expression version 
+base_method <- function() {
+  payment <- dbReadTable(sakila, "payment")
+  rental <- dbReadTable(sakila, "rental")
+  inventory <- dbReadTable(sakila, "inventory")
+  film <- dbReadTable(sakila, "film")
+
+  inventory_film <- merge(
+    inventory,
+    film[, c("film_id", "title")],
+    by = "film_id",
+    all.x = TRUE
+  )
+
+  rental_inventory_film <- merge(
+    rental[, c("rental_id", "inventory_id")],
+    inventory_film[, c("inventory_id", "title")],
+    by = "inventory_id",
+    all.x = TRUE
+  )
+
+  result <- merge(
+    payment[, c("rental_id", "amount")],
+    rental_inventory_film[, c("rental_id", "title")],
+    by = "rental_id",
+    all.x = TRUE
+  )
+
+  result <- result[order(result$amount, decreasing = TRUE), ]
+
+  result <- result[, c("title", "amount")]
+  colnames(result) <- c("film_title", "amount")
+
+  return(result)
+}
+
+#' SQL query version
+sql_method <- function() {
+  dbGetQuery(
+    sakila,
+    "SELECT rental_inventory_film.title AS film_title, payment.amount AS amount
+     FROM payment
+     LEFT JOIN
+       (SELECT rental.rental_id AS rental_id, inventory_film.title AS title 
+       FROM rental
+       LEFT JOIN
+         (SELECT inventory.inventory_id AS inventory_id, film.title AS title
+          FROM inventory 
+          LEFT JOIN film
+          ON inventory.film_id = film.film_id) AS inventory_film
+       ON rental.inventory_id = inventory_film.inventory_id) AS rental_inventory_film
+      ON payment.rental_id = rental_inventory_film.rental_id
+      ORDER BY amount DESC
+    "
+  )
+ }
+base_method()
+sql_method()
+# Benchmark
+microbenchmark(
+  Base_R = base_method(),
+  SQL_Query = sql_method(),
+  times = 50
+)
+
+```
+
+# Problem 3
 ```
