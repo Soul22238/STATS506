@@ -377,4 +377,19 @@ microbenchmark(
 ```
 
 # Problem 3
+## a
+```{r}
+records <- read.csv("au-500.csv")
+grep("\\.com$", records$web)/length(records$web)
+```
+
+## b
+```{r}
+emails <- strsplit(records$email, "@")
+usernames <- sapply(emails, "[[", 1)
+tbl <- table(usernames)
+most_common <- names(tbl)[which.max(tbl)]
+most_common
+
+
 ```
