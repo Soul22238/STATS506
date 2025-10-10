@@ -160,6 +160,8 @@ kable(coef_table, caption = "Estimated Incidence Rate Ratios (IRR) for Poisson M
 kable(stat_table, caption = "Model Statistics (Sample Size, Pseudo-R², and AIC)")
 
 ```
+## d
+The p-value is smaller than 5% and the 95 percent confidence interval for IRR is (1.02, 1.04). The predicted tympanometric width differs significantly between men and women.
 ```{r}
 coef_gender <- summary(model_2L)$coefficients["genderFemale", "Estimate"]
 se_gender <- summary(model_2L)$coefficients["genderFemale", "Std. Error"]
@@ -170,15 +172,10 @@ CI_upper <- exp(coef_gender + 1.96 * se_gender)
 
 cat("IRR =", round(IRR, 2), " (95% CI:", round(CI_lower, 2), "-", round(CI_upper, 2), ")\n")
 
-
 model_data <- model_2L$model
 
-
 model_data$predicted_left <- predict(model_2L, type = "response")
-
-
 tapply(model_data$predicted_left, model_data$gender, mean)
-
 
 t_test_result <- t.test(predicted_left ~ gender, data = model_data)
 t_test_result
@@ -199,7 +196,7 @@ if (t_test_result$p.value < 0.05) {
 ```
 # Problem 2
 ## a
-I queried chatGPT for apply functions to write active ratios
+I queried chatGPT for apply functions to write active ratios in SQL
 ```{r}
 library(DBI)
 sakila <- dbConnect(RSQLite::SQLite(), "sakila.db")
@@ -218,8 +215,8 @@ base_method <- function() {
   tbl <- data.frame(
     store_id = c(1, 2),
     active_ratio = c(
-      sum(store1$active == 1) / nrow(store1),
-      sum(store2$active == 1) / nrow(store2)
+      sum(store1$active == 1) / nrow(store1) * 100,
+      sum(store2$active == 1) / nrow(store2) * 100
     ),
     customer_count = c(nrow(store1), nrow(store2))
   )
@@ -232,7 +229,7 @@ sql_method <- function() {
   dbGetQuery(
     sakila,
     "SELECT store_id,
-            SUM(CASE WHEN active = 1 THEN 1 ELSE 0 END) * 1.0 / COUNT(*) AS active_ratio,
+            100.0 * AVG(active) AS active_ratio,
             COUNT(customer_id) AS customer_count
      FROM customer
      GROUP BY store_id"
@@ -274,7 +271,7 @@ base_method <- function() {
   # staff + add_country
   result <- merge(staff, add_country, by.x = "address_id", by.y = "address_id", all.x = TRUE)
   
-  result <- result[, c("staff_id", "first_name", "last_name", "country")]
+  result <- result[, c("staff_id", "first_name", "last_name", "country_id", "country")]
   result
 }
 
@@ -283,10 +280,10 @@ base_method <- function() {
 sql_method <- function() {
  dbGetQuery(
    sakila,
-   "SELECT staff.staff_id AS staff_id, staff.first_name AS first_name, staff.last_name AS last_name, add_country.country AS country 
+   "SELECT staff.staff_id AS staff_id, staff.first_name AS first_name, staff.last_name AS last_name, add_country.country_id AS country_id, add_country.country AS country 
     FROM staff 
     LEFT JOIN
-      (SELECT add_city.addr_id AS addr_id, country.country AS country
+      (SELECT add_city.addr_id AS addr_id, country.country AS country, country.country_id AS country_id
       FROM country AS country
       RIGHT JOIN
         (SELECT address.address_id AS addr_id, city.country_id AS country_id
@@ -307,6 +304,7 @@ microbenchmark(
 )
 ```
 ### c
+I queried chatGPT for the base R expressions and then modified the codes.
 ```{r}
 # Base R method
 #' Regular R expression version 
@@ -316,52 +314,32 @@ base_method <- function() {
   inventory <- dbReadTable(sakila, "inventory")
   film <- dbReadTable(sakila, "film")
 
-  inventory_film <- merge(
-    inventory,
-    film[, c("film_id", "title")],
-    by = "film_id",
-    all.x = TRUE
-  )
+  merged <- merge(payment, rental, by = "rental_id", all.x = TRUE)
+  merged <- merge(merged, inventory, by = "inventory_id", all.x = TRUE)
+  merged <- merge(merged, film[, c("film_id", "title")], by = "film_id", all.x = TRUE)
 
-  rental_inventory_film <- merge(
-    rental[, c("rental_id", "inventory_id")],
-    inventory_film[, c("inventory_id", "title")],
-    by = "inventory_id",
-    all.x = TRUE
-  )
+  result <- aggregate(merged$amount, by = list(film_title = merged$title), FUN = sum)
 
-  result <- merge(
-    payment[, c("rental_id", "amount")],
-    rental_inventory_film[, c("rental_id", "title")],
-    by = "rental_id",
-    all.x = TRUE
-  )
+  colnames(result)[2] <- "total_amount"
+  result <- result[order(result$total_amount, decreasing = TRUE), ]
 
-  result <- result[order(result$amount, decreasing = TRUE), ]
-
-  result <- result[, c("title", "amount")]
-  colnames(result) <- c("film_title", "amount")
-
-  return(result)
+  return(result[1:10,])
 }
 
 #' SQL query version
 sql_method <- function() {
   dbGetQuery(
     sakila,
-    "SELECT rental_inventory_film.title AS film_title, payment.amount AS amount
-     FROM payment
-     LEFT JOIN
-       (SELECT rental.rental_id AS rental_id, inventory_film.title AS title 
-       FROM rental
-       LEFT JOIN
-         (SELECT inventory.inventory_id AS inventory_id, film.title AS title
-          FROM inventory 
-          LEFT JOIN film
-          ON inventory.film_id = film.film_id) AS inventory_film
-       ON rental.inventory_id = inventory_film.inventory_id) AS rental_inventory_film
-      ON payment.rental_id = rental_inventory_film.rental_id
-      ORDER BY amount DESC
+    "
+    SELECT f.title AS film_title,
+           SUM(p.amount) AS total_amount
+    FROM payment p
+    LEFT JOIN rental r ON p.rental_id = r.rental_id
+    LEFT JOIN inventory i ON r.inventory_id = i.inventory_id
+    LEFT JOIN film f ON i.film_id = f.film_id
+    GROUP BY f.title
+    ORDER BY total_amount DESC
+    LIMIT 10;
     "
   )
  }
@@ -386,8 +364,8 @@ grep("\\.com$", records$web)/length(records$web)
 ## b
 ```{r}
 emails <- strsplit(records$email, "@")
-usernames <- sapply(emails, "[[", 1)
-tbl <- table(usernames)
+domain_name <- sapply(emails, "[[", 2)
+tbl <- table(domain_name)
 most_common <- names(tbl)[which.max(tbl)]
 most_common
 
