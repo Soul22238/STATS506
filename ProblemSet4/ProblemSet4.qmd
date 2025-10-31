@@ -1,0 +1,194 @@
+---
+title: "Problem Set 4"
+format:
+  html:
+    embed-resources: true
+editor: visual
+---
+
+Github link: https://github.com/Soul22238/STATS506/tree/main/ProblemSet4
+
+# Problem 1
+```{r}
+library(tidyverse)
+library(nzelect)
+```
+## a
+```{r}
+nzge %>%
+  group_by(election_year, voting_type) %>%
+  summarise(total_votes = sum(votes, na.rm = TRUE)) %>%
+  arrange(desc(total_votes))
+```
+
+```{r}
+head(nzge)
+```
+
+## b
+```{r}
+nzge %>%
+  filter(election_year == 2014, voting_type == "Candidate") %>%
+  group_by(party) %>%
+  summarise(votes = sum(votes, na.rm = TRUE)) %>%
+  mutate(percent = votes / sum(votes) * 100) %>%
+  arrange(desc(percent))
+```
+
+## c
+```{r}
+winners <- nzge %>%
+  group_by(election_year, voting_type, party) %>%
+  summarise(total_votes = sum(votes, na.rm = TRUE)) %>%
+  slice_max(total_votes, n = 1) %>%
+  select(election_year, voting_type, party)
+
+winners %>%
+  pivot_wider(names_from = voting_type, values_from = party, 
+              names_prefix = "Winner_")
+
+```
+
+# Problem 2
+```{r}
+matches <- read_csv("atp_matches_2019.txt", show_col_types = FALSE)
+matches
+```
+## a
+There are 128 tournaments in the year 2019
+```{r}
+matches <- read_csv("atp_matches_2019.txt", show_col_types = FALSE)
+
+tournaments_2019 <- matches %>%
+  filter(str_starts(tourney_id, "2019")) %>%
+  summarise(count = n_distinct(tourney_id))
+
+print(tournaments_2019)
+
+```
+
+
+## b
+```{r}
+winners <- matches %>%
+  filter(round == "F") %>%
+  select(tourney_id, winner_id, winner_name) %>%
+  group_by(winner_id) %>%
+  summarise(counts = n_distinct(winner_id)) %>%
+  arrange(desc(counts))
+  
+winners
+```
+
+## c
+Rafael Nadal has the most wins
+```{r}
+hypothesis_test_result <- matches %>%
+
+  select(w_ace, l_ace) %>%
+  filter(!is.na(w_ace), !is.na(l_ace)) %>%
+  
+  with(t.test(w_ace, l_ace, 
+              paired = TRUE, 
+              alternative = "greater")) 
+  
+  ## 3. Tidy Output: Pipe the t.test result into broom::tidy()
+  #tidy()
+
+# Display the tidied result table
+print(hypothesis_test_result)
+```
+## d
+```{r}
+long_match_data <- matches %>%
+  
+  bind_rows(
+    select(., player_id = winner_id, player_name = winner_name) %>% 
+      mutate(is_win = 1),
+    select(., player_id = loser_id, player_name = loser_name) %>%
+      mutate(is_win = 0)
+  )
+player_summary <- long_match_data %>%
+  
+  group_by(player_id, player_name) %>%
+  summarise(
+    Total_Wins = sum(is_win, na.rm = TRUE), 
+    Total_Matches = n(),                   
+    .groups = 'drop'                      
+  ) %>%
+  filter(Total_Matches >= 5)
+
+
+final_win_rate_ranking <- player_summary %>%
+  
+
+  mutate(
+    Win_Rate = Total_Wins / Total_Matches
+  ) %>%
+  
+  arrange(desc(Win_Rate)) %>%
+  
+  select(
+    player_name, 
+    Win_Rate, 
+    Total_Wins, 
+    Total_Matches, 
+    player_id
+  )
+
+
+print(final_win_rate_ranking)
+```
+
+# Problem 3
+
+```{r}
+covid <- read.csv("us-states.txt", show_col_types = FALSE)
+head(covid)
+```
+
+## a
+```{r}
+
+library(ggplot2)
+
+
+national_cases <- covid  %>%
+  
+  # 确保日期是 Date 类型 (Base R 的 as.Date())
+  mutate(date = as.Date(date)) %>%
+  
+  # 汇总所有州，得到全国每日的 7 天新增病例总平均数
+  group_by(date) %>%
+  summarise(
+    National_Cases_Avg = sum(cases_avg, na.rm = TRUE), 
+    .groups = 'drop'
+  )
+
+covid_spikes_plot <- national_cases %>%
+  ggplot(aes(x = date, y = National_Cases_Avg)) +
+  
+  geom_line(color = "darkred", linewidth = 1) +
+  
+  scale_x_date(
+    date_breaks = "6 months",           
+    date_labels = "%Y %b"               
+  ) +
+  
+  labs(
+    title = "U.S. National COVID-19 Waves",
+    subtitle = "7-Day Average New Cases",
+    x = "Date",
+    y = "Avg. New Cases (National)"
+  ) 
+
+print(covid_spikes_plot)
+```
+
+
+```{r}
+```
+
+
+```{r}
+```
