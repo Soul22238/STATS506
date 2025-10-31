@@ -21,9 +21,7 @@ nzge %>%
   arrange(desc(total_votes))
 ```
 
-```{r}
-head(nzge)
-```
+
 
 ## b
 ```{r}
@@ -41,19 +39,14 @@ winners <- nzge %>%
   group_by(election_year, voting_type, party) %>%
   summarise(total_votes = sum(votes, na.rm = TRUE)) %>%
   slice_max(total_votes, n = 1) %>%
-  select(election_year, voting_type, party)
+  select(election_year, voting_type, winner_party = party)
 
-winners %>%
-  pivot_wider(names_from = voting_type, values_from = party, 
-              names_prefix = "Winner_")
+winners 
 
 ```
 
 # Problem 2
-```{r}
-matches <- read_csv("atp_matches_2019.txt", show_col_types = FALSE)
-matches
-```
+
 ## a
 There are 128 tournaments in the year 2019
 ```{r}
@@ -62,26 +55,27 @@ matches <- read_csv("atp_matches_2019.txt", show_col_types = FALSE)
 tournaments_2019 <- matches %>%
   filter(str_starts(tourney_id, "2019")) %>%
   summarise(count = n_distinct(tourney_id))
-
 print(tournaments_2019)
 
 ```
 
 
 ## b
+There are 12 winners winning more than one match. The highest record is winning 5 tournaments.
 ```{r}
 winners <- matches %>%
   filter(round == "F") %>%
-  select(tourney_id, winner_id, winner_name) %>%
   group_by(winner_id) %>%
-  summarise(counts = n_distinct(winner_id)) %>%
+  summarise(counts = n_distinct(tourney_id)) %>%
+  filter(counts > 1) %>%
   arrange(desc(counts))
   
 winners
 ```
 
 ## c
-Rafael Nadal has the most wins
+Given the significance p value (2.2e-16), we can say that there are evidence that
+winners have more aces than losers.
 ```{r}
 hypothesis_test_result <- matches %>%
 
@@ -91,14 +85,14 @@ hypothesis_test_result <- matches %>%
   with(t.test(w_ace, l_ace, 
               paired = TRUE, 
               alternative = "greater")) 
-  
-  ## 3. Tidy Output: Pipe the t.test result into broom::tidy()
-  #tidy()
+
 
 # Display the tidied result table
 print(hypothesis_test_result)
 ```
 ## d
+The players with the highest win-rate are Rafael Nadal, Novak Djokovic, Roger Federer,
+Daniil Medvedev, and Kevin Anderson.
 ```{r}
 long_match_data <- matches %>%
   
@@ -117,48 +111,32 @@ player_summary <- long_match_data %>%
     .groups = 'drop'                      
   ) %>%
   filter(Total_Matches >= 5)
-
-
 final_win_rate_ranking <- player_summary %>%
-  
-
-  mutate(
-    Win_Rate = Total_Wins / Total_Matches
-  ) %>%
-  
+  mutate(Win_Rate = Total_Wins / Total_Matches) %>%
   arrange(desc(Win_Rate)) %>%
-  
-  select(
-    player_name, 
-    Win_Rate, 
-    Total_Wins, 
-    Total_Matches, 
-    player_id
-  )
+  select(player_name, Win_Rate, Total_Wins, Total_Matches, player_id) %>%
+  slice_head(n = 5)
 
 
-print(final_win_rate_ranking)
+final_win_rate_ranking
 ```
 
 # Problem 3
 
 ```{r}
-covid <- read.csv("us-states.txt", show_col_types = FALSE)
+covid <- read.csv("us-states.txt")
 head(covid)
 ```
 
 ## a
+There is one significant spike and about 4 minor spikes.
 ```{r}
 
 library(ggplot2)
-
-
 national_cases <- covid  %>%
   
-  # 确保日期是 Date 类型 (Base R 的 as.Date())
   mutate(date = as.Date(date)) %>%
   
-  # 汇总所有州，得到全国每日的 7 天新增病例总平均数
   group_by(date) %>%
   summarise(
     National_Cases_Avg = sum(cases_avg, na.rm = TRUE), 
@@ -185,10 +163,71 @@ covid_spikes_plot <- national_cases %>%
 print(covid_spikes_plot)
 ```
 
-
+## b
+I queried chatgpt for the codes in ggplot grammar and revised the codes.
+I calculate the total cumulative covid case rate per 100K population for every state and ranks them from highest to lowest to get the highest and lowest overall rates per population.
+The main differences are the Maine has a huge spike in 2022, whereas Rhode Island
+experience minor spikes at the same time.
 ```{r}
+state_ranking <- covid %>%
+  mutate(date = as.Date(date)) %>%
+  group_by(state) %>%
+  summarise(Cumulative_Rate = sum(cases_avg_per_100k, na.rm = TRUE), .groups = 'drop') %>%
+  arrange(desc(Cumulative_Rate))
+
+highest_state_name <- head(state_ranking$state, 1)
+lowest_state_name <- tail(state_ranking$state, 1)
+
+comparison_data <- covid %>%
+  filter(state %in% c(highest_state_name, lowest_state_name)) %>%
+  mutate(date = as.Date(date))
+
+trajectory_plot <- comparison_data %>%
+  ggplot(aes(x = date, 
+             y = cases_avg_per_100k, 
+             color = state)) +
+
+  geom_line()
+
+print(trajectory_plot)
 ```
 
-
+## c
+The criterion used to define "substantial" is a 7-day average of 150 or more new cases per 100K residents. The top 5 states are North Dakota, South Dakota, Wyoming, Alaska, and Northern Mariana Islands
 ```{r}
+
+top_5_states_info <- covid %>%
+  mutate(date = as.Date(date)) %>%
+  filter(cases_avg_per_100k >= 150) %>%
+  group_by(state) %>%
+  summarise(first_exp = min(date)) %>%
+  arrange(first_exp) %>%
+  slice_head(n = 5) %>%
+  pull(state) 
+cat(top_5_states_info)
+
+plot_data_top5 <- covid %>%
+  filter(state %in% top_5_states_info) %>%
+  mutate(date = as.Date(date)) 
+
+trajectory_plot_top5_avg <- plot_data_top5 %>%
+  ggplot(aes(x = date, 
+             y = cases_avg_per_100k, 
+             color = state)) +
+  
+  geom_line(linewidth = 1) +
+  scale_x_date(date_breaks = "6 months", date_labels = "%Y %b") + 
+  
+  labs(
+    title = "COVID-19 Trajectories: Top 5 Highest Average Daily Rate States",
+    subtitle = "Daily Avg. Cases per 100K Population",
+    x = "Date",
+    y = "Avg. Cases per 100K"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  )
+
+trajectory_plot_top5_avg
 ```
