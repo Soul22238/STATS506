@@ -1,0 +1,55 @@
+---
+title: "Problem Set 4"
+format:
+  html:
+    embed-resources: true
+editor: visual
+---
+Github link: https://github.com/Soul22238/STATS506/tree/main/ProblemSet4
+# Problem Set 5
+## Problem 1
+### a
+```{r}
+setClass("waldCI", slots = c(level = "numeric",
+                   lb = "numeric",
+                   ub = "numeric",
+                   mean = "numeric",
+                   sterr = "numeric"))
+## Constructor
+waldCI <- function(level = 0.95,
+                    mean = NULL,
+                    sterr = NULL,
+                    lb = NULL,
+                    ub = NULL) {
+   return(new("color_vector",level = level, mean = mean, sterr = sterr, lb = lb, ub = ub))
+}
+
+## Validator
+setValidity("waldCI", function(object){
+  if (object@level >=1 | object@level <=0){
+    stop(paste("@confidence level = ", object@level, "is not a valid confidence level"))
+  } elseif(object@ub <= object@lb) {
+    stop(paste("@upper bound ", object@ub, "bigger than @lower bound",object@lb ))
+  } elseif(object@sterr <0){
+    stop(paste("@standard error ", object@sterr, "should not be <0",object@sterr ))
+  }
+  return (TRUE)
+})
+
+## show method
+##' @title Display a `waldCI` object
+##' @param object A `waldCI` object
+setMethod("show", "waldCI",
+  function(object) {
+    cat("confidence level: ", object@level)
+    cat("mean: ", object@mean)
+    cat("standard error: ", object@sterr)
+    cat("upper bound: ", object@lb)
+    cat("lower bound: ", object@ub)
+    cat("\n")
+    return(invisible(object))
+  }
+)
+# 
+
+```
