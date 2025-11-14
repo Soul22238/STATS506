@@ -1,11 +1,12 @@
 ---
-title: "Problem Set 4"
+title: "Problem Set 5"
 format:
   html:
     embed-resources: true
 editor: visual
 ---
-Github link: https://github.com/Soul22238/STATS506/tree/main/ProblemSet4
+Github link: https://github.com/Soul22238/STATS506/tree/main/ProblemSet5
+
 # Problem Set 5
 ## Problem 1
 ### a
@@ -21,18 +22,35 @@ waldCI <- function(level = 0.95,
                     sterr = NULL,
                     lb = NULL,
                     ub = NULL) {
-   return(new("color_vector",level = level, mean = mean, sterr = sterr, lb = lb, ub = ub))
+   z <- qnorm(1 - (1 - level)/2)
+   if (!is.null(mean) && !is.null(sterr)){
+     lb <- mean - z * sterr
+     ub <- mean + z * sterr
+   } else if (!is.null(lb) && !is.null(ub)) {
+    mean <- (lb + ub) / 2
+    sterr <- (ub - lb) / (2 * z)
+  } else {
+    stop("You must provide either (mean, sterr) or (lb, ub).")
+  }
+   return(new("waldCI",level = level, mean = mean, sterr = sterr, lb = lb, ub = ub))
 }
 
 ## Validator
 setValidity("waldCI", function(object){
-  if (object@level >=1 | object@level <=0){
-    stop(paste("@confidence level = ", object@level, "is not a valid confidence level"))
-  } elseif(object@ub <= object@lb) {
-    stop(paste("@upper bound ", object@ub, "bigger than @lower bound",object@lb ))
-  } elseif(object@sterr <0){
-    stop(paste("@standard error ", object@sterr, "should not be <0",object@sterr ))
+  if (!is.finite(object@level) || object@level >= 1 || object@level <= 0){
+    return(paste("@confidence level =", object@level, "is not a valid confidence level (must be 0 < level < 1)."))
   }
+
+  if (!is.finite(object@ub) || !is.finite(object@lb) || object@ub <= object@lb) {
+    if (is.finite(object@ub) && is.finite(object@lb) && object@ub <= object@lb) {
+      return(paste("@upper bound", object@ub, "must be strictly greater than @lower bound", object@lb))
+    } 
+  }
+  
+  if (is.finite(object@sterr) && object@sterr < 0){
+    return(paste("@standard error", object@sterr, "must not be < 0."))
+  }
+  
   return (TRUE)
 })
 
@@ -42,14 +60,365 @@ setValidity("waldCI", function(object){
 setMethod("show", "waldCI",
   function(object) {
     cat("confidence level: ", object@level)
+    cat("\n")
     cat("mean: ", object@mean)
+    cat("\n")
     cat("standard error: ", object@sterr)
-    cat("upper bound: ", object@lb)
-    cat("lower bound: ", object@ub)
+    cat("\n")
+    cat("upper bound: ", object@ub)
+    cat("\n")
+    cat("lower bound: ", object@lb)
     cat("\n")
     return(invisible(object))
   }
 )
-# 
+# accessors
+setGeneric("lb",
+           function(object) {
+             standardGeneric("lb")
+           })
+setMethod("lb", "waldCI",
+          function(object) {
+            return(slot(object, "lb"))
+          })
+setGeneric("ub",
+           function(object) {
+             standardGeneric("ub")
+           })
+setMethod("ub", "waldCI",
+          function(object) {
+            return(slot(object, "ub"))
+          })
+setGeneric("mean",
+           function(object) {
+             standardGeneric("mean")
+           })
+setMethod("mean", "waldCI",
+          function(object) {
+            return(slot(object, "mean"))
+          })
+setGeneric("sterr",
+           function(object) {
+             standardGeneric("sterr")
+           })
+setMethod("sterr", "waldCI",
+          function(object) {
+            return(slot(object, "sterr"))
+          })
+setGeneric("level",
+           function(object) {
+             standardGeneric("level")
+           })
+setMethod("level", "waldCI",
+          function(object) {
+            return(slot(object, "level"))
+          })
+# Setters
+setGeneric("lb<-",
+           function(object, value) {
+             standardGeneric("lb<-")
+           })
+setMethod("lb<-", "waldCI",
+  function(object, value) {
+    object@lb <- value
+    validObject(object) 
+    return(object)
+  }
+)
 
+setGeneric("ub<-",
+           function(object, value) {
+             standardGeneric("ub<-")
+           })
+setMethod("ub<-", "waldCI",
+  function(object, value) {
+    object@ub <- value
+    validObject(object) 
+    return(object)
+  }
+)
+
+setGeneric("mean<-",
+           function(object, value) {
+             standardGeneric("mean<-")
+           })
+setMethod("mean<-", "waldCI",
+  function(object, value) {
+    object@mean <- value
+    validObject(object) 
+    return(object)
+  }
+)
+
+setGeneric("sterr<-",
+           function(object, value) {
+             standardGeneric("sterr<-")
+           })
+setMethod("sterr<-", "waldCI",
+  function(object, value) {
+    object@sterr <- value
+    validObject(object) 
+    return(object)
+  }
+)
+
+setGeneric("level<-",
+           function(object, value) {
+             standardGeneric("level<-")
+           })
+setMethod("level<-", "waldCI",
+  function(object, value) {
+    object@level <- value
+    validObject(object) 
+    return(object)
+  }
+)
+
+# Contains
+setGeneric("contains",
+           function(object, value) {
+             standardGeneric("contains")
+           })
+setMethod("contains", c("waldCI", "numeric"),
+  function(object, value) {
+    value >= object@lb & value <= object@ub
+  })
+
+# Overlap
+setGeneric("overlap",function(object1, object2) {
+             standardGeneric("overlap")
+           })
+setMethod("overlap", c("waldCI", "waldCI"),
+  function(object1, object2) {
+    !(object1@ub < object2@lb | object2@ub < object1@lb)
+  })
+
+# as.numeric
+
+setMethod("as.numeric", "waldCI",
+  function(x) {
+  c(x@lb, x@ub)
+})
+
+# transformCI
+setGeneric("transformCI",
+           function(object, f) {
+             standardGeneric("transformCI")
+           })
+
+setMethod("transformCI",
+          signature(object = "waldCI", f = "function"),
+          function(object, f) {
+            # warn the user
+            warning("Only monotonic functions are meaningful for transforming confidence intervals.")
+
+            # apply f to bounds
+            new_lb <- f(object@lb)
+            new_ub <- f(object@ub)
+
+            # if decreasing monotone, swap
+            if (new_lb > new_ub) {
+              tmp <- new_lb
+              new_lb <- new_ub
+              new_ub <- tmp
+            }
+
+
+            new_obj <- waldCI(level = object@level,
+                              lb = new_lb,
+                              ub = new_ub,
+                              mean = NULL,
+                              sterr = NULL)
+            validObject(new_obj)
+            return(new_obj)
+          })
+
+```
+
+### b
+```{r}
+
+ci1 <- waldCI(level = 0.95, lb = 17.2, ub = 24.7)
+ci2 <- waldCI(level = 0.99, mean = 13, sterr = 2.5)
+ci3 <- waldCI(level = 0.75, lb = 27.43, ub = 39.22)
+ci1
+ci2
+ci3
+as.numeric(ci1)
+as.numeric(ci2)
+as.numeric(ci3)
+lb(ci2)
+ub(ci2)
+mean(ci1)
+sterr(ci3)
+level(ci2)
+lb(ci2) <- 10.5
+mean(ci3) <- 34
+level(ci3) <- .8
+contains(ci1, 17)
+contains(ci3, 44)
+overlap(ci1, ci2)
+eci1 <- transformCI(ci1, sqrt)
+eci1
+mean(transformCI(ci2, log))
+```
+
+### c
+```{r, error=TRUE}
+# Expected not allowed
+waldCI(level = 0.95, mean = 10, sterr = -1)
+```
+```{r, error=TRUE}
+waldCI(level = 0.95, lb = 5, ub = 4)
+```
+
+```{r, error=TRUE}
+waldCI(level = 0.95, lb = 5, ub = 5)
+```
+
+```{r, error=TRUE}
+waldCI(level = 1, mean = 10, sterr = 1)
+```
+
+```{r, error=TRUE}
+ci_valid <- waldCI(lb = 10, ub = 20)
+lb(ci_valid) <- 25
+```
+
+
+
+## Problem 3
+### a
+There are one significant spike and about 4 minor spikes.
+I queried chatgpt for the grammar of plotly and revised them.
+```{r, error=TRUE}
+covid <- read.csv("us-states.txt")
+library(dplyr)
+library(plotly)
+
+
+national_cases <- covid %>%
+  # Convert the date column to the Date format
+  mutate(date = as.Date(date)) %>%
+  # Group data by date
+  group_by(date) %>%
+  # Summarize to calculate the national daily average cases
+  summarise(
+    National_Cases_Avg = sum(cases_avg, na.rm = TRUE),
+    .groups = 'drop'
+  )
+
+# 2. Create the Interactive Plot using plot_ly()
+covid_spikes_plot_plotly <- national_cases %>%
+  # Start the plot with plot_ly, defining x, y, type, mode, and line style
+  plot_ly(x = ~date, y = ~National_Cases_Avg,
+          type = 'scatter', mode = 'lines',
+          line = list(color = 'darkred', width = 1)) %>%
+
+  layout(
+    title = list(text = "U.S. National COVID-19 Waves<br><sup>7-Day Average New Cases</sup>"),
+
+
+    xaxis = list(
+      title = "Date",
+      dtick = "M6",          
+      tickformat = "%Y %b"   # Display format: 2020 Jan
+    ),
+
+    yaxis = list(title = "Avg. New Cases (National)")
+  )
+
+# 3. Print the interactive chart
+covid_spikes_plot_plotly
+```
+
+### b
+I calculate the total cumulative covid case rate per 100K population for every state and ranks them from highest to lowest to get the highest and lowest overall rates per population. The main differences are the Maine has a huge spike in 2022, whereas Rhode Island experience minor spikes at the same time.
+```{r, error=TRUE}
+
+state_ranking <- covid %>%
+
+  mutate(date = as.Date(date)) %>%
+  group_by(state) %>%
+  summarise(Cumulative_Rate = sum(cases_avg_per_100k, na.rm = TRUE), .groups = 'drop') %>%
+  # Arrange states in descending order of the cumulative rate
+  arrange(desc(Cumulative_Rate))
+
+# Get the names of the highest and lowest ranked states
+highest_state_name <- head(state_ranking$state, 1)
+lowest_state_name <- tail(state_ranking$state, 1)
+
+# Filter the main data to include only the two states for comparison
+comparison_data <- covid %>%
+  filter(state %in% c(highest_state_name, lowest_state_name)) %>%
+  mutate(date = as.Date(date))
+
+trajectory_plot_plotly <- comparison_data %>%
+  # Start the plot with plot_ly
+  plot_ly(x = ~date, 
+          y = ~cases_avg_per_100k, 
+          color = ~state,  
+          type = 'scatter', 
+          mode = 'lines') %>%
+  
+  # Set the chart layout (titles and labels)
+  layout(
+    title = "COVID-19 Trajectory",
+    xaxis = list(title = "Date"),
+    yaxis = list(title = "7-Day Avg. Cases per 100k")
+  )
+
+trajectory_plot_plotly
+```
+### c
+I referenced the solution of Problem Set 5 and chatgpt for plotly grammar.
+We can see from this messy plot that the first spike is approximately from 2020-03-21 to 2020-05-20.
+```{r, error=TRUE}
+library(lubridate)
+
+covid20 <- covid %>%
+  mutate(Date = as.Date(date)) %>%
+  filter(year(Date) == 2020) %>%
+  select(state, date, cases_avg_per_100k)
+
+trajectory_plot_no_legend <- covid20 %>%
+  plot_ly(x = ~date, 
+          y = ~cases_avg_per_100k, 
+          split = ~state,         
+          type = 'scatter', 
+          mode = 'lines',
+          showlegend = FALSE) %>% 
+  
+  layout(
+    yaxis = list(title = "COVID cases per 100k")
+  )
+
+trajectory_plot_no_legend
+```
+
+I restrict the data to have cases_avg_per_100k to be larger than 15 and zoom into March, April, and May.
+We can know from the plot that the top 5 states are New York, New Jersey, Louisiana, Gaum, and Connecticut.
+```{r, error=TRUE}
+
+covid20_mar_may <- covid20 %>%
+  mutate(Date = as.Date(date)) %>%
+  filter(cases_avg_per_100k > 15) %>%
+  filter(month(Date) %in% c(3, 4, 5)) 
+
+trajectory_plot_plotly <- covid20_mar_may %>%
+  plot_ly(x = ~Date, 
+          y = ~cases_avg_per_100k, 
+          split = ~state,        
+          type = 'scatter', 
+          mode = 'lines',
+          showlegend = TRUE) %>% 
+  
+  layout(
+    title = "COVID-19 Cases per 100k (March - May)",
+    yaxis = list(title = "COVID cases per 100k"),
+    xaxis = list(title = "Date",
+                 type = "date")
+  )
+
+trajectory_plot_plotly
 ```
