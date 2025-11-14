@@ -7,7 +7,6 @@ editor: visual
 ---
 Github link: https://github.com/Soul22238/STATS506/tree/main/ProblemSet5
 
-# Problem Set 5
 ## Problem 1
 ### a
 ```{r}
